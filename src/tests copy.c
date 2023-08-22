@@ -5,7 +5,7 @@
 
 // A normal C function that is executed as a thread
 // when its name is specified in pthread_create()
-void *philosopher(void *vargp)
+void *myThreadFun(void *vargp)
 {
 	(void) *vargp;
 	sleep(1);
@@ -15,14 +15,10 @@ void *philosopher(void *vargp)
 
 int main()
 {
-	pthread_t t1;
-	pthread_t t2;
+	pthread_t thread_id;
 	printf("Before Thread\n");
-	pthread_create(&t1, NULL, philosopher, NULL);
-	pthread_join(t1, NULL);
-	// pthread_join(t2, NULL);
+	pthread_create(&thread_id, NULL, myThreadFun, NULL);
+	pthread_join(thread_id, NULL);
 	printf("After Thread\n");
-	pthread_create(&t2, NULL, philosopher, NULL);
-	pthread_join(t2, NULL);
 	exit(0);
 }

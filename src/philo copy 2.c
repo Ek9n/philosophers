@@ -51,57 +51,53 @@ int	ft_atoi(const char *str)
 
 void	*t_philosopher(void *param)
 {
-	t_philo	*philo = (t_philo *)param;
-	// pthread_mutex_lock(&philo->data->lock);
-	// printf("numofphilo=%d\n", data->numofphilo);
+	struct philosophers	*vars = (struct philosophers *)param;
+	pthread_mutex_lock(&vars->lock);
+	int n = vars->numofphilo;
+	// printf("numofphilo=%d\n", vars->numofphilo);
 	for(int i = 0; i < 1; i++)
 	{
-		printf("philosopher%d\n", philo->n);
-		printf("id=%lu\n", philo->tid);
+		printf("philosopher%d\n", n + 1);
+		printf("id=%lu\n", vars->nphilos[n].tid);
 	}
-	// pthread_mutex_unlock(&philo->data->lock);
+	pthread_mutex_unlock(&vars->lock);
 	return (NULL);
 }
 
 // int number_of_philosophers, int time_to_die, int time_to_eat, int time_to_sleep int[number_of_times_each_philosopher_must_eat]
 int	main(int argc, char **argv)
 {
-	static t_data	data;
-	static t_philo	*philos;
-
-	int	i = -1;
+	static struct philosophers	vars;
+	int	i = 0;
 
 	if (argc == 4 || argc == 5)
 	{
-		data.numofphilos = ft_atoi(argv[1]);
-		printf("numofphilos=%d\n\n", data.numofphilos);
+		vars.numofphilos = ft_atoi(argv[1]);
+		printf("numofphilos=%d\n\n", vars.numofphilos);
 
-		philos = malloc(data.numofphilos * sizeof(t_philo));
-		while (++i < data.numofphilos)
+		vars.nphilos = malloc(vars.numofphilos * sizeof(t_philo));
+		
+        pthread_mutex_init(&vars.lock, NULL);
+
+		while(i < vars.numofphilos)
 		{
-			philos[i].data = &data;
-			philos[i].n = i + 1;
-		}
-        pthread_mutex_init(&data.lock, NULL);
-		int	i = -1;
-		while(++i < data.numofphilos)
-		{
-			// data.numofphilo = i;
-        	if (pthread_create(&philos[i].tid, NULL, t_philosopher, &philos[i]) != 0)
+			vars.numofphilo = i;
+        	if (pthread_create(&vars.nphilos[i].tid, NULL, t_philosopher, &vars) != 0)
            		printf("\nThread can't be created");
 			// printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!i=%d\n", i);
+			i++;
 		}
-		i = -1;
-		while (++i < data.numofphilos)
-    		pthread_join(philos[i].tid, NULL);
+		i = 0;
+    		// pthread_join(vars.nphilos[i].tid, NULL);
+		while (1);
 	}
 	else
 	{
 		ft_putstr_fd("(main)Error - wrong num of args\n", 2);
 	}
 
-    // pthread_mutex_destroy(&data.lock);
-	free(philos);
+    // pthread_mutex_destroy(&vars.lock);
+	free(vars.nphilos);
 
 	return (0);
 }
