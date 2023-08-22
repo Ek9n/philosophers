@@ -16,39 +16,6 @@
 // and X with the philosopher number.
 // int number_of_philosophers, int time_to_die, int time_to_eat, int time_to_sleep int[number_of_times_each_philosopher_must_eat]
 
-void	ft_putstr_fd(char *s, int fd)
-{
-	int	i;
-
-	i = 0;
-	while (s[i] != '\0')
-		write(fd, &s[i++], 1);
-}
-
-int	ft_atoi(const char *str)
-{
-	int		sign;
-	int		res;
-	int		i;
-
-	res = 0;
-	sign = 1;
-	i = 0;
-	while (str[i] != '\0' && ((9 <= str[i] && str[i] <= 13) || str[i] == 32))
-		i++;
-	if (str[i] == '-' || str[i] == '+')
-	{
-		if (str[i++] == '-')
-			sign = -1;
-	}
-	while (str[i] && str[i] >= '0' && str[i] <= '9')
-	{
-		res = res * 10 + str[i] - '0';
-		i++;
-	}
-	return (res * sign);
-}
-
 void	*t_philosopher(void *param)
 {
 	t_philo	*philo = (t_philo *)param;

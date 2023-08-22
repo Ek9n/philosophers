@@ -1,45 +1,46 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philosophers.h                                     :+:      :+:    :+:   */
+/*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/22 11:18:27 by hstein            #+#    #+#             */
+/*   Created: 2023/08/22 22:41:19 by hstein            #+#    #+#             */
 /*   Updated: 2023/08/22 23:44:23 by hstein           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PHILOSOPHERS_H
-# define PHILOSOPHERS_H
+#include "philosophers.h"
 
-# include <pthread.h>
-# include <stdio.h>
-# include <stdlib.h>
-# include <string.h>
-# include <unistd.h>
-# include <time.h>
-# include <sys/time.h>
-
-typedef struct	data
+void	ft_putstr_fd(char *s, int fd)
 {
-	int				numofphilos;
-	int				numofphilo;
-	pthread_mutex_t	lock;
-} t_data;
+	int	i;
 
-typedef struct philosopher
+	i = 0;
+	while (s[i] != '\0')
+		write(fd, &s[i++], 1);
+}
+
+int	ft_atoi(const char *str)
 {
-	pthread_t	tid;
-	int			n;
-	t_data		*data;
+	int		sign;
+	int		res;
+	int		i;
 
-} t_philo;
-
-
-void	ft_putstr_fd(char *s, int fd);
-int		ft_atoi(const char *str);
-
-#endif
-
-// cc src/philo.c src/utils.c && ./a.out 5 2 3 4
+	res = 0;
+	sign = 1;
+	i = 0;
+	while (str[i] != '\0' && ((9 <= str[i] && str[i] <= 13) || str[i] == 32))
+		i++;
+	if (str[i] == '-' || str[i] == '+')
+	{
+		if (str[i++] == '-')
+			sign = -1;
+	}
+	while (str[i] && str[i] >= '0' && str[i] <= '9')
+	{
+		res = res * 10 + str[i] - '0';
+		i++;
+	}
+	return (res * sign);
+}
