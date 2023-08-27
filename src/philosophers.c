@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 20:21:26 by hstein            #+#    #+#             */
-/*   Updated: 2023/08/28 00:25:42 by hstein           ###   ########.fr       */
+/*   Updated: 2023/08/28 01:09:15 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,16 @@ void	*t_philosopher(void *param)
 {
 	t_philo	*philo = (t_philo *)param;
 	pthread_mutex_t *tmp_rightfork;
+	size_t			life;
 		// printf("HALLO\n");
-
+	life = philo->data->timetodie;
 	while (1)
 	{
+		if (philo->data->timetodie <= 0)
+		{
+			printf("%d %d died\n", get_time(philo->data), philo->n);
+			return (NULL);
+		}
 		if (philo->data->numofphilos == 1)
 		{
 			usleep(philo->data->timetodie * 1000);
