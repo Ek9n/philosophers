@@ -6,7 +6,7 @@
 /*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 20:21:26 by hstein            #+#    #+#             */
-/*   Updated: 2023/08/29 01:24:08 by hstein           ###   ########.fr       */
+/*   Updated: 2023/08/30 00:44:20 by hstein           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,44 +33,75 @@ void	*t_philosopher(void *param)
 	pthread_mutex_t *tmp_rightfork;
 	long			life;
 		// printf("HALLO\n");
-	life = philo->data->timetodie;
-	if (philo->data->numofphilos == 1)
+	life = philo->timetodie;
+	if (philo->numofphilos == 1)
 	{
-		usleep(philo->data->timetodie * 1000);
+		usleep(philo->timetodie * 1000);
 		printf("%d %d died\n", get_time(philo->data), philo->n);
 		return (NULL);
 	}
 	while (1)
 	{
-		// if (life - get_time(philo->data) <= 0)
 		if (life <= 0)
 		{
+				pthread_mutex_lock(&philo->data->printlock);
 			printf("%d %d died\n", get_time(philo->data), philo->n);
+				pthread_mutex_unlock(&philo->data->printlock);
 			return (NULL);
 		}
 		else
 		{
-			life = philo->data->timetodie;
+			life = philo->timetodie;
 		}
-		if (philo->n == philo->data->numofphilos)
+		if (philo->n == philo->numofphilos)
 		{
-			tmp_rightfork = &(philo - philo->data->numofphilos)->fork;
+			tmp_rightfork = &(philo - philo->numofphilos)->fork;
 			pthread_mutex_lock(&philo->fork);
+				pthread_mutex_lock(&philo->data->printlock);
+			printf("%d %d has taken a fork\n", get_time(philo->data), philo->n);
+				pthread_mutex_unlock(&philo->data->printlock);
 			pthread_mutex_lock(tmp_rightfork);
+				pthread_mutex_lock(&philo->data->printlock);
+			printf("%d %d has taken a fork\n", get_time(philo->data), philo->n);
+				pthread_mutex_unlock(&philo->data->printlock);
 		}
 		else
 		{
 			tmp_rightfork = &(philo + 1)->fork;
 			pthread_mutex_lock(&philo->fork);
+				pthread_mutex_lock(&philo->data->printlock);
+			printf("%d %d has taken a fork\n", get_time(philo->data), philo->n);
+				pthread_mutex_unlock(&philo->data->printlock);
 			pthread_mutex_lock(tmp_rightfork);
+				pthread_mutex_lock(&philo->data->printlock);
+			printf("%d %d has taken a fork\n", get_time(philo->data), philo->n);
+				pthread_mutex_unlock(&philo->data->printlock);
 		}
+		life = philo->timetoeat;
+		usleep(philo->timetoeat * 1000);
+			pthread_mutex_lock(&philo->data->printlock);
 		printf("%d %d is eating\n", get_time(philo->data), philo->n);
-		usleep(philo->data->timetoeat * 1000);
+			pthread_mutex_unlock(&philo->data->printlock);
 		pthread_mutex_unlock(&philo->fork);
 		pthread_mutex_unlock(tmp_rightfork);
 		life -= philo->data->timetoeat;
+
+
+			pthread_mutex_lock(&philo->data->printlock);
 		printf("%d %d is sleeping\n", get_time(philo->data), philo->n);
-		usleep(philo->data->timetosleep * 1000);
+			pthread_mutex_unlock(&philo->data->printlock);
+		usleep(philo->timetosleep * 1000);
+		life -= philo->timetosleep;
+		if (life <= 0)
+		{
+				pthread_mutex_lock(&philo->data->printlock);
+			printf("%d %d died\n", get_time(philo->data), philo->n);
+				pthread_mutex_unlock(&philo->data->printlock);
+			return (NULL);
+		}
+			pthread_mutex_lock(&philo->data->printlock);
+		printf("%d %d is thinking\n", get_time(philo->data), philo->n);
+			pthread_mutex_unlock(&philo->data->printlock);
 		// printf("PhiloN%d\n", philo->n);
 		// pthread_mutex_lock(&(philo + 1)->fork);
 		// sleep (doing nothing)
@@ -105,18 +136,19 @@ int	main(int argc, char **argv)
 		data.timetodie = ft_atoi(argv[2]);
 		data.timetoeat = ft_atoi(argv[3]);
 		data.timetosleep = ft_atoi(argv[4]);
-		// printf("numofphilos=%d\n", data.numofphilos);
-		// printf("numofphilos=%d\n", data.timetodie);
-		// printf("numofphilos=%d\n", data.timetoeat);
-		// printf("numofphilos=%d\n\n", data.timetosleep);
-
+		pthread_mutex_init(&data.printlock, NULL);
 		philos = malloc(data.numofphilos * sizeof(t_philo));
 		while (++i < data.numofphilos)
 		{
+			philos[i].start_time = data.start_time;
+			philos[i].numofphilos = data.numofphilos;
+			philos[i].timetodie = data.timetodie;
+			philos[i].timetoeat = data.timetoeat;
+			philos[i].timetosleep = data.timetosleep;
 			philos[i].data = &data;
 			philos[i].n = i + 1;
+			pthread_mutex_init(&philos[i].fork, NULL);
 		}
-        pthread_mutex_init(&data.lock, NULL);
 		i = -1;
 		while(++i < data.numofphilos)
 		{
@@ -125,7 +157,7 @@ int	main(int argc, char **argv)
            		printf("\nThread can't be created");
 			}
 
-			usleep(data.timetodie / 2 * 1000);
+			usleep(philos->timetodie / 2 * 1000);
 		}
 		i = -1;
 		while (++i < data.numofphilos)
@@ -136,6 +168,7 @@ int	main(int argc, char **argv)
 		ft_putstr_fd("(main)Error - wrong num of args\n", 2);
 	}
 
+    // pthread_mutex_init(&data.lock, NULL);
     // pthread_mutex_destroy(&data.lock);
 	free(philos);
 

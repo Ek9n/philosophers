@@ -6,12 +6,12 @@
 #    By: hstein <hstein@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/08/06 16:46:40 by hstein            #+#    #+#              #
-#    Updated: 2023/08/27 00:29:33 by hstein           ###   ########.fr        #
+#    Updated: 2023/08/30 00:36:48 by hstein           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME	= philosophers
-CFLAGS	= -Wall -Wextra -Werror
+CFLAGS	= -Wall -Wextra -Werror -g
 RM		= rm -rf
 HEADERS = -I ./include
 SRCS	= 	src/philosophers.c	\
