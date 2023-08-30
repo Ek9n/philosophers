@@ -6,7 +6,7 @@
 /*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 20:21:26 by hstein            #+#    #+#             */
-/*   Updated: 2023/08/30 00:44:20 by hstein           ###   ########.fr       */
+/*   Updated: 2023/08/30 17:47:48 by hstein           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,67 +31,40 @@ void	*t_philosopher(void *param)
 {
 	t_philo	*philo = (t_philo *)param;
 	pthread_mutex_t *tmp_rightfork;
-	long			life;
+	int			life;
 		// printf("HALLO\n");
-	life = philo->timetodie;
+life = philo->timetodie;
+// printf("Philo:%d, life_start=%d\n", philo->n, life);
+// '
+// tmp_rightfork = &(philos[0].fork); // Zeiger auf die Gabel des ersten Philosophen
+//     }
+//     else
+//     {
+//         tmp_rightfork = &(philo[1].fork); // Zei
+// '
 	if (philo->numofphilos == 1)
 	{
 		usleep(philo->timetodie * 1000);
 		printf("%d %d died\n", get_time(philo->data), philo->n);
 		return (NULL);
 	}
+	int next_philo_index = ((philo->n + 1) % philo->numofphilos) - 1;
+	tmp_rightfork = &(philo[next_philo_index].fork);
+
+	// if (philo->n == philo->numofphilos)
+	// {
+	// 	// printf("HALLOO\n");
+	// 	tmp_rightfork = &(philo - philo->numofphilos)->fork;
+	// }
+	// else
+	// {
+	// 		// pthread_mutex_lock(&philo->data->printlock); // hier eventuell mutex
+	// 	tmp_rightfork = &(philo + 1 * sizeof(t_philo))->fork;
+	// 	// tmp_rightfork = &philo[1].fork;
+	// 		// pthread_mutex_unlock(&philo->data->printlock);
+	// }
 	while (1)
 	{
-		if (life <= 0)
-		{
-				pthread_mutex_lock(&philo->data->printlock);
-			printf("%d %d died\n", get_time(philo->data), philo->n);
-				pthread_mutex_unlock(&philo->data->printlock);
-			return (NULL);
-		}
-		// else
-		// {
-		// 	life = philo->timetodie;
-		// }
-		if (philo->n == philo->numofphilos)
-		{
-			tmp_rightfork = &(philo - philo->numofphilos)->fork;
-			pthread_mutex_lock(&philo->fork);
-				pthread_mutex_lock(&philo->data->printlock);
-			printf("%d %d has taken a fork\n", get_time(philo->data), philo->n);
-				pthread_mutex_unlock(&philo->data->printlock);
-			pthread_mutex_lock(tmp_rightfork);
-				pthread_mutex_lock(&philo->data->printlock);
-			printf("%d %d has taken a fork\n", get_time(philo->data), philo->n);
-				pthread_mutex_unlock(&philo->data->printlock);
-		}
-		else
-		{
-			tmp_rightfork = &(philo + 1)->fork;
-			pthread_mutex_lock(&philo->fork);
-				pthread_mutex_lock(&philo->data->printlock);
-			printf("%d %d has taken a fork\n", get_time(philo->data), philo->n);
-				pthread_mutex_unlock(&philo->data->printlock);
-			pthread_mutex_lock(tmp_rightfork);
-				pthread_mutex_lock(&philo->data->printlock);
-			printf("%d %d has taken a fork\n", get_time(philo->data), philo->n);
-				pthread_mutex_unlock(&philo->data->printlock);
-		}
-		life = philo->timetodie;
-		life -= philo->data->timetoeat;
-		usleep(philo->timetoeat * 1000);
-			pthread_mutex_lock(&philo->data->printlock);
-		printf("%d %d is eating\n", get_time(philo->data), philo->n);
-			pthread_mutex_unlock(&philo->data->printlock);
-		pthread_mutex_unlock(&philo->fork);
-		pthread_mutex_unlock(tmp_rightfork);
-
-
-			pthread_mutex_lock(&philo->data->printlock);
-		printf("%d %d is sleeping\n", get_time(philo->data), philo->n);
-			pthread_mutex_unlock(&philo->data->printlock);
-		usleep(philo->timetosleep * 1000);
-		life -= philo->timetosleep;
 		if (life <= 0)
 		{
 				pthread_mutex_lock(&philo->data->printlock);
@@ -102,6 +75,46 @@ void	*t_philosopher(void *param)
 			pthread_mutex_lock(&philo->data->printlock);
 		printf("%d %d is thinking\n", get_time(philo->data), philo->n);
 			pthread_mutex_unlock(&philo->data->printlock);
+
+		pthread_mutex_lock(&philo->fork);
+			pthread_mutex_lock(&philo->data->printlock);
+		printf("%d %d has taken a fork\n", get_time(philo->data), philo->n);
+			pthread_mutex_unlock(&philo->data->printlock);
+		pthread_mutex_lock(tmp_rightfork);
+			pthread_mutex_lock(&philo->data->printlock);
+		printf("%d %d has taken a fork\n", get_time(philo->data), philo->n);
+			pthread_mutex_unlock(&philo->data->printlock);
+
+	life = philo->timetodie;
+	life -= philo->data->timetoeat;
+	// printf("Philo:%d, life_1=%d\n", philo->n, life);
+		printf("%d %d is eating\n", get_time(philo->data), philo->n);
+		usleep(philo->timetoeat * 1000);
+			pthread_mutex_lock(&philo->data->printlock);
+			pthread_mutex_unlock(&philo->data->printlock);
+		pthread_mutex_unlock(&philo->fork);
+		pthread_mutex_unlock(tmp_rightfork);
+		if (life <= 0)
+		{
+				pthread_mutex_lock(&philo->data->printlock);
+			printf("%d %d died\n", get_time(philo->data), philo->n);
+				pthread_mutex_unlock(&philo->data->printlock);
+			return (NULL);
+		}
+
+			pthread_mutex_lock(&philo->data->printlock);
+		printf("%d %d is sleeping\n", get_time(philo->data), philo->n);
+			pthread_mutex_unlock(&philo->data->printlock);
+		usleep(philo->timetosleep * 1000);
+	life -= philo->timetosleep;
+	// printf("Philo:%d, life_2=%d\n", philo->n, life);
+		if (life <= 0)
+		{
+				pthread_mutex_lock(&philo->data->printlock);
+			printf("%d %d died\n", get_time(philo->data), philo->n);
+				pthread_mutex_unlock(&philo->data->printlock);
+			return (NULL);
+		}
 		// printf("PhiloN%d\n", philo->n);
 		// pthread_mutex_lock(&(philo + 1)->fork);
 		// sleep (doing nothing)
@@ -128,6 +141,7 @@ int	main(int argc, char **argv)
 	static t_philo	*philos;
 
 	int	i = -1;
+	int sleeptime = 1000;
 
 	if (argc == 4 || argc == 5)
 	{
@@ -150,14 +164,52 @@ int	main(int argc, char **argv)
 			pthread_mutex_init(&philos[i].fork, NULL);
 		}
 		i = -1;
-		while(++i < data.numofphilos)
+		if (data.numofphilos % 2 == 0)
 		{
-        	if (pthread_create(&philos[i].tid, NULL, t_philosopher, &philos[i]) != 0)
+			i = -1;
+			while (++i < data.numofphilos)
 			{
-           		printf("\nThread can't be created");
+				if (i % 2 != 0)
+				{
+					if (pthread_create(&philos[i].tid, NULL, t_philosopher, &philos[i]) != 0)
+						printf("\nThread can't be created");
+				}
+			}	
+			usleep(sleeptime);
+			i = -1;	
+			while (++i < data.numofphilos)
+			{
+				if (i % 2 == 0)
+				{
+					if (pthread_create(&philos[i].tid, NULL, t_philosopher, &philos[i]) != 0)
+						printf("\nThread can't be created");
+				}
 			}
-
-			usleep(philos->timetodie / 2 * 1000);
+		}
+		else
+		{
+			if (pthread_create(&philos[0].tid, NULL, t_philosopher, &philos[0]) != 0)
+				printf("\nThread can't be created");
+			i = 0;
+			usleep(sleeptime);
+			while (++i < data.numofphilos)
+			{
+				if (i % 2 != 0)
+				{
+					if (pthread_create(&philos[i].tid, NULL, t_philosopher, &philos[i]) != 0)
+						printf("\nThread can't be created");
+				}
+			}	
+			usleep(sleeptime);
+			i = 0;	
+			while (++i < data.numofphilos)
+			{
+				if (i % 2 == 0)
+				{
+					if (pthread_create(&philos[i].tid, NULL, t_philosopher, &philos[i]) != 0)
+						printf("\nThread can't be created");
+				}
+			}
 		}
 		i = -1;
 		while (++i < data.numofphilos)
