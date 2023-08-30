@@ -6,7 +6,7 @@
 /*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 20:21:26 by hstein            #+#    #+#             */
-/*   Updated: 2023/08/30 17:47:48 by hstein           ###   ########.fr       */
+/*   Updated: 2023/08/30 18:30:40 by hstein           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,37 +32,33 @@ void	*t_philosopher(void *param)
 	t_philo	*philo = (t_philo *)param;
 	pthread_mutex_t *tmp_rightfork;
 	int			life;
-		// printf("HALLO\n");
-life = philo->timetodie;
-// printf("Philo:%d, life_start=%d\n", philo->n, life);
-// '
-// tmp_rightfork = &(philos[0].fork); // Zeiger auf die Gabel des ersten Philosophen
-//     }
-//     else
-//     {
-//         tmp_rightfork = &(philo[1].fork); // Zei
-// '
+
+	life = philo->timetodie;
+	int next_philo_index = ((philo->n + 1) % philo->numofphilos) - 1;
+	tmp_rightfork = &(philo[next_philo_index].fork);
+
 	if (philo->numofphilos == 1)
 	{
 		usleep(philo->timetodie * 1000);
 		printf("%d %d died\n", get_time(philo->data), philo->n);
 		return (NULL);
 	}
-	int next_philo_index = ((philo->n + 1) % philo->numofphilos) - 1;
-	tmp_rightfork = &(philo[next_philo_index].fork);
 
-	// if (philo->n == philo->numofphilos)
-	// {
-	// 	// printf("HALLOO\n");
-	// 	tmp_rightfork = &(philo - philo->numofphilos)->fork;
-	// }
-	// else
-	// {
-	// 		// pthread_mutex_lock(&philo->data->printlock); // hier eventuell mutex
-	// 	tmp_rightfork = &(philo + 1 * sizeof(t_philo))->fork;
-	// 	// tmp_rightfork = &philo[1].fork;
-	// 		// pthread_mutex_unlock(&philo->data->printlock);
-	// }
+	while (1) // flag fuer death
+	{
+	// think
+		
+	// eat
+
+	// sleep
+		usleep(philo->timetosleep * 1000);
+		pthread_mutex_lock(&philo->data->printlock);
+		printf("%d %d is sleeping\n", get_time(philo->data), philo->n);
+		pthread_mutex_unlock(&philo->data->printlock);
+	}
+
+
+
 	while (1)
 	{
 		if (life <= 0)
