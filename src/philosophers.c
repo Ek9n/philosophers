@@ -49,10 +49,10 @@ void	*t_philosopher(void *param)
 				pthread_mutex_unlock(&philo->data->printlock);
 			return (NULL);
 		}
-		else
-		{
-			life = philo->timetodie;
-		}
+		// else
+		// {
+		// 	life = philo->timetodie;
+		// }
 		if (philo->n == philo->numofphilos)
 		{
 			tmp_rightfork = &(philo - philo->numofphilos)->fork;
@@ -77,14 +77,14 @@ void	*t_philosopher(void *param)
 			printf("%d %d has taken a fork\n", get_time(philo->data), philo->n);
 				pthread_mutex_unlock(&philo->data->printlock);
 		}
-		life = philo->timetoeat;
+		life = philo->timetodie;
+		life -= philo->data->timetoeat;
 		usleep(philo->timetoeat * 1000);
 			pthread_mutex_lock(&philo->data->printlock);
 		printf("%d %d is eating\n", get_time(philo->data), philo->n);
 			pthread_mutex_unlock(&philo->data->printlock);
 		pthread_mutex_unlock(&philo->fork);
 		pthread_mutex_unlock(tmp_rightfork);
-		life -= philo->data->timetoeat;
 
 
 			pthread_mutex_lock(&philo->data->printlock);
