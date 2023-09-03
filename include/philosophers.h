@@ -6,7 +6,7 @@
 /*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 11:18:27 by hstein            #+#    #+#             */
-/*   Updated: 2023/08/30 00:35:19 by hstein           ###   ########.fr       */
+/*   Updated: 2023/09/03 15:27:30 by hstein           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@
 # include <time.h>
 # include <sys/time.h>
 # include <stdbool.h>
+
+enum week{dieing, thinking, eating, sleeping, forking};
 
 typedef struct	data
 {
