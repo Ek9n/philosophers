@@ -6,11 +6,11 @@
 #    By: hstein <hstein@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/08/06 16:46:40 by hstein            #+#    #+#              #
-#    Updated: 2023/08/30 00:36:48 by hstein           ###   ########.fr        #
+#    Updated: 2023/09/04 23:27:00 by hstein           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME	= philosophers
+NAME	= philo
 CFLAGS	= -Wall -Wextra -Werror -g
 RM		= rm -rf
 HEADERS = -I ./include

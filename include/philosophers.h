@@ -6,7 +6,7 @@
 /*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 11:18:27 by hstein            #+#    #+#             */
-/*   Updated: 2023/09/04 05:13:00 by hstein           ###   ########.fr       */
+/*   Updated: 2023/09/04 19:03:36 by hstein           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,9 @@ typedef struct	data
 	int				timetosleep;
 	int				numofphilos;
 	int				maxmeals;	
+	bool			deadflag;
 	pthread_mutex_t	printlock;
+	pthread_mutex_t	deadlock;
 } t_data;
 
 typedef struct philosopher
@@ -49,6 +51,7 @@ typedef struct philosopher
 	pthread_mutex_t	fork;
 	pthread_mutex_t	*right_fork;
 	t_data			*data;
+	// void			*philos_start;
 
 } t_philo;
 

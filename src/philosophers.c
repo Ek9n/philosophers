@@ -6,7 +6,7 @@
 /*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 20:21:26 by hstein            #+#    #+#             */
-/*   Updated: 2023/09/04 05:30:54 by hstein           ###   ########.fr       */
+/*   Updated: 2023/09/05 00:19:06 by hstein           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,19 @@ void	printmsg(t_philo *philo, enum week opt)
 	static int	prevtime;
 	int			time = get_time(philo->start_time);
 	philo->life -= time - prevtime;
+	
+	pthread_mutex_lock(&philo->data->printlock);
+	printf("  philo:%d, time:%d, life:%d\n", philo->n, time, philo->life);
+	pthread_mutex_unlock(&philo->data->printlock);
+
+
+	// pthread_mutex_lock(&philo->data->deadlock);
+	// if (philo->data->deadflag)
+	// {
+	// 	// opt = 0;
+	// }
+	// pthread_mutex_unlock(&philo->data->deadlock);
+
 	if (philo->life <= 0)
 	{
 		opt = 0;
@@ -45,6 +58,8 @@ void	printmsg(t_philo *philo, enum week opt)
 		pthread_mutex_lock(&philo->data->printlock);
 		printf("%d %d died\n", time, philo->n);
 		pthread_mutex_unlock(&philo->data->printlock);
+		// free((philo - (philo->n - 1) * sizeof(philo)));
+		// free(philo->philos_start);
 		exit(-1); // alle threads beenden sich... data races werden weniger..komisch
 		// pthread_exit(NULL); // soll angeblich safer sein und sachen freigeben... data races mehr.. und nicht alle threads werden beendet
 	}
@@ -151,7 +166,8 @@ int	main(int argc, char **argv)
 			philos[i].data = &data;
 			philos[i].n = i + 1;
 			philos[i].right_fork = &philos[(i + 1) % data.numofphilos].fork;
-			
+			// philos[i].philos_start = (t_philo*)philos;
+		
 			// if (i == data.numofphilos - 1)
 			// 	philos[i].n = 1;
 			// else
@@ -174,6 +190,8 @@ int	main(int argc, char **argv)
 	{
 		ft_putstr_fd("(main)Error - wrong num of args\n", 2);
 	}
+	// while (1)
+	// 	printf("hi\n");
 
     // pthread_mutex_init(&data.lock, NULL);
     // pthread_mutex_destroy(&data.lock);
