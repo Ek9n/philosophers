@@ -6,7 +6,7 @@
 /*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 11:18:27 by hstein            #+#    #+#             */
-/*   Updated: 2023/09/03 15:27:30 by hstein           ###   ########.fr       */
+/*   Updated: 2023/09/04 05:13:00 by hstein           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,13 @@ typedef struct	data
 	int				timetoeat;
 	int				timetosleep;
 	int				numofphilos;
+	int				maxmeals;	
 	pthread_mutex_t	printlock;
 } t_data;
 
 typedef struct philosopher
-{
+{	
+	int				life;
 	int				start_time;
 	int				timetodie;
 	int				timetoeat;
@@ -45,6 +47,7 @@ typedef struct philosopher
 	int				n;
 	pthread_t		tid;
 	pthread_mutex_t	fork;
+	pthread_mutex_t	*right_fork;
 	t_data			*data;
 
 } t_philo;
@@ -53,7 +56,8 @@ typedef struct philosopher
 void	ft_putstr_fd(char *s, int fd);
 int		ft_atoi(const char *str);
 int		current_time(void);
-int		get_time(t_data *data);
+int		get_time(int start_time);
+// int		lapsed_time(t_data *data);
 
 #endif
 

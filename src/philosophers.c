@@ -6,7 +6,7 @@
 /*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 20:21:26 by hstein            #+#    #+#             */
-/*   Updated: 2023/09/03 16:47:56 by hstein           ###   ########.fr       */
+/*   Updated: 2023/09/04 05:30:54 by hstein           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,36 +27,49 @@
 // and X with the philosopher number.
 // int number_of_philosophers, int time_to_die, int time_to_eat, int time_to_sleep int[number_of_times_each_philosopher_must_eat]
 
+
 void	printmsg(t_philo *philo, enum week opt)
 {
+	static int	prevtime;
+	int			time = get_time(philo->start_time);
+	philo->life -= time - prevtime;
+	if (philo->life <= 0)
+	{
+		opt = 0;
+	}
+	// pthread_mutex_lock(&philo->data->printlock);
+	// get_time(philo->data)//
+	// pthread_mutex_unlock(&philo->data->printlock);
 	if (opt == 0)
 	{
 		pthread_mutex_lock(&philo->data->printlock);
-		printf("%d %d died\n", get_time(philo->data), philo->n);
+		printf("%d %d died\n", time, philo->n);
 		pthread_mutex_unlock(&philo->data->printlock);
+		exit(-1); // alle threads beenden sich... data races werden weniger..komisch
+		// pthread_exit(NULL); // soll angeblich safer sein und sachen freigeben... data races mehr.. und nicht alle threads werden beendet
 	}
 	else if (opt == 1)
 	{
 		pthread_mutex_lock(&philo->data->printlock);
-		printf("%d %d is thinking\n", get_time(philo->data), philo->n);
+		printf("%d %d is thinking\n", time, philo->n);
 		pthread_mutex_unlock(&philo->data->printlock);
 	}
 	else if (opt == 2)
 	{
 		pthread_mutex_lock(&philo->data->printlock);
-		printf("%d %d is eating\n", get_time(philo->data), philo->n);
+		printf("%d %d is eating\n", time, philo->n);
 		pthread_mutex_unlock(&philo->data->printlock);
 	}
 	else if (opt == 3)
 	{
 		pthread_mutex_lock(&philo->data->printlock);
-		printf("%d %d is sleeping\n", get_time(philo->data), philo->n);
+		printf("%d %d is sleeping\n", time, philo->n);
 		pthread_mutex_unlock(&philo->data->printlock);
 	}
 	else if (opt == 4)
 	{
 		pthread_mutex_lock(&philo->data->printlock);
-		printf("%d %d has taken a fork\n", get_time(philo->data), philo->n);
+		printf("%d %d has taken a fork\n", time, philo->n);
 		pthread_mutex_unlock(&philo->data->printlock);
 	}
 	else
@@ -65,25 +78,17 @@ void	printmsg(t_philo *philo, enum week opt)
 		printf("(printmsg) - Error, wrong option");
 		pthread_mutex_unlock(&philo->data->printlock);
 	}
+	prevtime = time;
 }
 
 void	*t_philosopher(void *param)
 {
 	t_philo	*philo = (t_philo *)param;
-	pthread_mutex_t *tmp_rightfork;
-	int				life;
-	int 			next_philo_index;
-
-	life = philo->timetodie;
-	next_philo_index = philo->n % philo->numofphilos;
-	printf("philo:%d, next idx:%d\n", philo->n, next_philo_index);
-
-	tmp_rightfork = &(philo[next_philo_index].fork);
 
 	if (philo->numofphilos == 1)
 	{
 		usleep(philo->timetodie * 1000);
-		printf("%d %d died\n", get_time(philo->data), philo->n);
+		printf("%d %d died\n", get_time(philo->start_time), philo->n);
 		return (NULL);
 	}
 
@@ -91,20 +96,21 @@ void	*t_philosopher(void *param)
 	{
 	// think
 		printmsg(philo, thinking);
-
 	// eat
 		pthread_mutex_lock(&philo->fork);
 		printmsg(philo, forking);
-		pthread_mutex_lock(tmp_rightfork);
+		pthread_mutex_lock(philo->right_fork);
 		printmsg(philo, forking);
 		printmsg(philo, eating);
+		philo->life = philo->timetodie;
+		// philo->life -= philo->timetoeat;
+		//if life<timetodie -> die
 		usleep(philo->timetoeat * 1000);
+		pthread_mutex_unlock(philo->right_fork);
 		pthread_mutex_unlock(&philo->fork);
-		pthread_mutex_unlock(tmp_rightfork);
 
 	// sleep
 		printmsg(philo, sleeping);
-		// pause ();
 		usleep(philo->timetosleep * 1000);
 	}
 
@@ -116,28 +122,42 @@ int	main(int argc, char **argv)
 {
 	static t_data	data;
 	static t_philo	*philos;
+	int				i;
 
-	int	i = -1;
 	// int sleeptime = 1000;
 
-	if (argc == 4 || argc == 5)
+	if (argc == 5 || argc == 6)
 	{
 		data.start_time = current_time();
 		data.numofphilos = ft_atoi(argv[1]);
 		data.timetodie = ft_atoi(argv[2]);
 		data.timetoeat = ft_atoi(argv[3]);
 		data.timetosleep = ft_atoi(argv[4]);
+		if (argc == 6)
+			data.maxmeals = ft_atoi(argv[5]);
 		pthread_mutex_init(&data.printlock, NULL);
 		philos = malloc(data.numofphilos * sizeof(t_philo));
+		i = -1;
 		while (++i < data.numofphilos)
 		{
 			philos[i].start_time = data.start_time;
 			philos[i].numofphilos = data.numofphilos;
+			if (argc == 6)
+				philos[i].maxmeals = data.maxmeals;
 			philos[i].timetodie = data.timetodie;
+			philos[i].life = data.timetodie;
 			philos[i].timetoeat = data.timetoeat;
 			philos[i].timetosleep = data.timetosleep;
 			philos[i].data = &data;
 			philos[i].n = i + 1;
+			philos[i].right_fork = &philos[(i + 1) % data.numofphilos].fork;
+			
+			// if (i == data.numofphilos - 1)
+			// 	philos[i].n = 1;
+			// else
+			// 	philos[i].n = i + 1;
+
+			// printf("philos[i].n = %d\n", philos[i].n);
 			pthread_mutex_init(&philos[i].fork, NULL);
 		}
 		i = -1;

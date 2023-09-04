@@ -6,7 +6,7 @@
 /*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 22:41:19 by hstein            #+#    #+#             */
-/*   Updated: 2023/08/27 23:43:28 by hstein           ###   ########.fr       */
+/*   Updated: 2023/09/04 04:41:47 by hstein           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,16 @@ int	current_time(void)
 	return ((current_time.tv_sec * 1000) + (current_time.tv_usec / 1000));
 }
 
-int	get_time(t_data *data)
+int	get_time(int start_time)
 {
-	return (current_time() - data->start_time);
+	return (current_time() - start_time);
 }
+
+// int	lapsed_time(t_data *data)
+// {
+// 	long		time;
+// 	static long	prevtime;
+
+// 	time = get_time(philo->data);
+// 	return (time - prevtime);
+// }
