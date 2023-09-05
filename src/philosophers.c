@@ -6,7 +6,7 @@
 /*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 20:21:26 by hstein            #+#    #+#             */
-/*   Updated: 2023/09/05 18:42:24 by hstein           ###   ########.fr       */
+/*   Updated: 2023/09/05 20:38:19 by hstein           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,23 +27,52 @@
 // and X with the philosopher number.
 // int number_of_philosophers, int time_to_die, int time_to_eat, int time_to_sleep int[number_of_times_each_philosopher_must_eat]
 
-void	timetodie(t_philo *philo)
+int	timetodie(t_philo *philo)
 {
-	static int	prevtime;
 	static int	time;
 
+	// if ()
+	// {
+
+	// }
 	time = get_time(philo->start_time);
-	philo->life -= time - prevtime;
+	philo->life -= time - philo->prevtime;
+	// printf("philo%d, life=%d\n", philo->n, philo->life);
+	pthread_mutex_lock(&philo->data->deadlock);
+	if (philo->data->deadflag)
+	{
+		if (philo->right_fork_flag)
+			pthread_mutex_unlock(philo->right_fork);
+		if (philo->fork_flag)
+			pthread_mutex_unlock(&philo->fork);
+		pthread_mutex_unlock(&philo->data->deadlock);
+		pthread_exit(NULL);
+	}
+	pthread_mutex_unlock(&philo->data->deadlock);
+	if (philo->life <= 0)
+	{
+		pthread_mutex_lock(&philo->data->printlock);
+		philo->data->deadflag = true;
+		printmsg(philo, 0);
+		pthread_mutex_unlock(&philo->data->printlock);
+		// pthread_mutex_lock(&philo->data->deadlock);
+		// pthread_mutex_unlock(&philo->data->deadlock);
+		return (1);
+	}
+	philo->prevtime = time;
+	return (0);
 }
 
 void	printmsg(t_philo *philo, enum week opt)
 {
-	static int	prevtime;
+	// static int	prevtime;
 	static int	time;
 	
 	// pthread_mutex_lock(&philo->data->printlock);
+
 	time = get_time(philo->start_time);
-	philo->life -= time - prevtime;
+	// philo->life -= time - prevtime;
+
 	// printf("  philo:%d, time:%d, life:%d\n", philo->n, time, philo->life);
 	// pthread_mutex_unlock(&philo->data->printlock);
 
@@ -106,7 +135,8 @@ void	printmsg(t_philo *philo, enum week opt)
 		// pthread_mutex_unlock(&philo->data->printlock);
 	}
 	// pthread_mutex_unlock(&philo->data->printlock);
-	prevtime = time;
+	
+	// prevtime = time;
 }
 
 void	*t_philosopher(void *param)
@@ -122,37 +152,38 @@ void	*t_philosopher(void *param)
 
 	while (1) // flag fuer death
 	{
-		
+		timetodie(philo);
+	// 	printmsg(philo, 0);
 	// think
 	pthread_mutex_lock(&philo->data->printlock);
 		printmsg(philo, thinking);
 	pthread_mutex_unlock(&philo->data->printlock);
 	// eat
-		usleep(20);
+												// usleep(20);
 		pthread_mutex_lock(&philo->fork);
 			philo->fork_flag = true;
+		timetodie(philo);
 	pthread_mutex_lock(&philo->data->printlock);
 		printmsg(philo, forking);
 	pthread_mutex_unlock(&philo->data->printlock);
-		usleep(20);
+												// usleep(20);
 		pthread_mutex_lock(philo->right_fork);
 			philo->right_fork_flag = true;
+		timetodie(philo);
 	pthread_mutex_lock(&philo->data->printlock);
 		printmsg(philo, forking);
 	pthread_mutex_unlock(&philo->data->printlock);
-	usleep(20);
+		philo->life = philo->timetodie;
 	pthread_mutex_lock(&philo->data->printlock);
 		printmsg(philo, eating);
 	pthread_mutex_unlock(&philo->data->printlock);
-		philo->life = philo->timetodie;
 		usleep(philo->timetoeat * 1000);
 		pthread_mutex_unlock(philo->right_fork);
 			philo->right_fork_flag = false;
-		usleep(20);
-
 		pthread_mutex_unlock(&philo->fork);
 			philo->fork_flag = false;
-		usleep(20);
+												// usleep(20);
+		timetodie(philo);
 
 	// sleep
 	pthread_mutex_lock(&philo->data->printlock);
@@ -231,7 +262,7 @@ int	main(int argc, char **argv)
 				if (pthread_create(&philos[i].tid, NULL, t_philosopher, &philos[i]) != 0)
 					printf("\nThread can't be created");
 		}	
-		usleep(100);
+		usleep(10);
 		i = -1;
 		while (++i < data.numofphilos)
 		{

@@ -6,7 +6,7 @@
 /*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 11:18:27 by hstein            #+#    #+#             */
-/*   Updated: 2023/09/05 18:30:54 by hstein           ###   ########.fr       */
+/*   Updated: 2023/09/05 20:13:32 by hstein           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ typedef struct	data
 
 typedef struct philosopher
 {	
+	int				prevtime;
 	int				life;
 	int				start_time;
 	int				timetodie;
@@ -64,6 +65,9 @@ void	ft_putstr_fd(char *s, int fd);
 int		ft_atoi(const char *str);
 int		current_time(void);
 int		get_time(int start_time);
+void	printmsg(t_philo *philo, enum week opt);
+int		timetodie(t_philo *philo);
+
 // int		lapsed_time(t_data *data);
 
 #endif
