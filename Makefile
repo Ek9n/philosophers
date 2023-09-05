@@ -6,12 +6,12 @@
 #    By: hstein <hstein@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/08/06 16:46:40 by hstein            #+#    #+#              #
-#    Updated: 2023/09/05 15:34:27 by hstein           ###   ########.fr        #
+#    Updated: 2023/09/05 21:31:36 by hstein           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME	= philo
-CFLAGS	= -Wall -Wextra -Werror -g #-fsanitize=thread
+CFLAGS	= -Wall -Wextra -Werror -g -fsanitize=thread
 RM		= rm -rf
 HEADERS = -I ./include
 SRCS	= 	src/philosophers.c	\

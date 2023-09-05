@@ -6,26 +6,11 @@
 /*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 20:21:26 by hstein            #+#    #+#             */
-/*   Updated: 2023/09/05 20:38:19 by hstein           ###   ########.fr       */
+/*   Updated: 2023/09/05 22:41:04 by hstein           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
-
-// memset, printf, malloc, free, write,
-// usleep, gettimeofday, pthread_create,
-// pthread_detach, pthread_join, pthread_mutex_init,
-// pthread_mutex_destroy, pthread_mutex_lock,
-// pthread_mutex_unlock
-//NO LIBFT
-
-// ◦ timestamp_in_ms X is eating
-// ◦ timestamp_in_ms X is sleeping
-// ◦ timestamp_in_ms X is thinking
-// ◦ timestamp_in_ms X died
-// Replace timestamp_in_ms with the current timestamp in milliseconds
-// and X with the philosopher number.
-// int number_of_philosophers, int time_to_die, int time_to_eat, int time_to_sleep int[number_of_times_each_philosopher_must_eat]
 
 int	timetodie(t_philo *philo)
 {
@@ -38,23 +23,24 @@ int	timetodie(t_philo *philo)
 	time = get_time(philo->start_time);
 	philo->life -= time - philo->prevtime;
 	// printf("philo%d, life=%d\n", philo->n, philo->life);
-	pthread_mutex_lock(&philo->data->deadlock);
+	// pthread_mutex_lock(&philo->data->deadlock);
 	if (philo->data->deadflag)
 	{
 		if (philo->right_fork_flag)
 			pthread_mutex_unlock(philo->right_fork);
 		if (philo->fork_flag)
 			pthread_mutex_unlock(&philo->fork);
-		pthread_mutex_unlock(&philo->data->deadlock);
+		pthread_mutex_unlock(&philo->data->printlock);
 		pthread_exit(NULL);
 	}
-	pthread_mutex_unlock(&philo->data->deadlock);
+	// pthread_mutex_unlock(&philo->data->deadlock);
 	if (philo->life <= 0)
 	{
-		pthread_mutex_lock(&philo->data->printlock);
+		// pthread_mutex_lock(&philo->data->printlock);
 		philo->data->deadflag = true;
+		printf(RED "%d %d died\n" WHT, time, philo->n);
 		printmsg(philo, 0);
-		pthread_mutex_unlock(&philo->data->printlock);
+		// pthread_mutex_unlock(&philo->data->printlock);
 		// pthread_mutex_lock(&philo->data->deadlock);
 		// pthread_mutex_unlock(&philo->data->deadlock);
 		return (1);
@@ -69,25 +55,12 @@ void	printmsg(t_philo *philo, enum week opt)
 	static int	time;
 	
 	// pthread_mutex_lock(&philo->data->printlock);
-
+	timetodie(philo);
 	time = get_time(philo->start_time);
-	// philo->life -= time - prevtime;
 
 	// printf("  philo:%d, time:%d, life:%d\n", philo->n, time, philo->life);
 	// pthread_mutex_unlock(&philo->data->printlock);
 
-
-	// pthread_mutex_lock(&philo->data->deadlock);
-	// if (philo->data->deadflag)
-	// {
-	// 	// opt = 0;
-	// }
-	// pthread_mutex_unlock(&philo->data->deadlock);
-
-	// if (philo->life <= 0)
-	// {
-	// 	opt = 0;
-	// }
 	if (opt == 0 || philo->life <= 0)
 	{
 		// pthread_mutex_lock(&philo->data->printlock);
@@ -152,7 +125,6 @@ void	*t_philosopher(void *param)
 
 	while (1) // flag fuer death
 	{
-		timetodie(philo);
 	// 	printmsg(philo, 0);
 	// think
 	pthread_mutex_lock(&philo->data->printlock);
@@ -162,19 +134,17 @@ void	*t_philosopher(void *param)
 												// usleep(20);
 		pthread_mutex_lock(&philo->fork);
 			philo->fork_flag = true;
-		timetodie(philo);
 	pthread_mutex_lock(&philo->data->printlock);
 		printmsg(philo, forking);
 	pthread_mutex_unlock(&philo->data->printlock);
 												// usleep(20);
 		pthread_mutex_lock(philo->right_fork);
 			philo->right_fork_flag = true;
-		timetodie(philo);
 	pthread_mutex_lock(&philo->data->printlock);
 		printmsg(philo, forking);
-	pthread_mutex_unlock(&philo->data->printlock);
+	// pthread_mutex_unlock(&philo->data->printlock);
 		philo->life = philo->timetodie;
-	pthread_mutex_lock(&philo->data->printlock);
+	// pthread_mutex_lock(&philo->data->printlock);
 		printmsg(philo, eating);
 	pthread_mutex_unlock(&philo->data->printlock);
 		usleep(philo->timetoeat * 1000);
@@ -183,7 +153,6 @@ void	*t_philosopher(void *param)
 		pthread_mutex_unlock(&philo->fork);
 			philo->fork_flag = false;
 												// usleep(20);
-		timetodie(philo);
 
 	// sleep
 	pthread_mutex_lock(&philo->data->printlock);
@@ -215,7 +184,6 @@ int	main(int argc, char **argv)
 			data.maxmeals = ft_atoi(argv[5]);
 		pthread_mutex_init(&data.printlock, NULL);
 		pthread_mutex_init(&data.deadlock, NULL);
-		pthread_mutex_init(&data.msglock, NULL);
 		philos = malloc(data.numofphilos * sizeof(t_philo));
 		i = -1;
 		while (++i < data.numofphilos)
