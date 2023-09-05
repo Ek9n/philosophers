@@ -6,7 +6,7 @@
 /*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 11:18:27 by hstein            #+#    #+#             */
-/*   Updated: 2023/09/05 20:13:32 by hstein           ###   ########.fr       */
+/*   Updated: 2023/09/05 22:52:47 by hstein           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ typedef struct	data
 	int				numofphilos;
 	int				maxmeals;	
 	bool			deadflag;
+	int				deadtime; //zeit hier vorher checken als deadtime und spaeter ausprinten
 	pthread_mutex_t	printlock;
 	pthread_mutex_t	msglock;
 	pthread_mutex_t	deadlock;
