@@ -6,7 +6,7 @@
 /*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 11:18:27 by hstein            #+#    #+#             */
-/*   Updated: 2023/09/07 16:47:22 by hstein           ###   ########.fr       */
+/*   Updated: 2023/09/07 17:30:36 by hstein           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ typedef struct	data
 
 typedef struct philosopher
 {	
+	int				pretime_check;
 	int				prevtime;
 	int				life;
 	int				start_time;

@@ -6,7 +6,7 @@
 /*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 20:21:26 by hstein            #+#    #+#             */
-/*   Updated: 2023/09/07 17:22:04 by hstein           ###   ########.fr       */
+/*   Updated: 2023/09/07 17:36:39 by hstein           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,10 +47,8 @@ int	timetodie(t_philo *philo)
 
 void	printmsg(t_philo *philo, enum week opt)
 {
-	// static int	prevtime;
 	static int	time;
 	
-	// pthread_mutex_lock(&philo->data->printlock);
 	timetodie(philo);
 	time = get_time(philo->start_time);
 
@@ -60,58 +58,32 @@ void	printmsg(t_philo *philo, enum week opt)
 
 	if (opt == 0 || philo->life <= 0)
 	{
-		// pthread_mutex_lock(&philo->data->printlock);
 		printf(RED "%d %d died\n" WHT, time, philo->n);
-		// pthread_mutex_unlock(&philo->data->printlock);
-		// free((philo - (philo->n - 1) * sizeof(philo)));
-		// free(philo->philos_start);
-		// exit(-1); // alle threads beenden sich... data races werden weniger..komisch
-		
 		if (philo->right_fork_flag)
 			pthread_mutex_unlock(philo->right_fork);
 		if (philo->fork_flag)
 			pthread_mutex_unlock(&philo->fork);
 		pthread_mutex_unlock(&philo->data->printlock);
-		pthread_exit(NULL); // soll angeblich safer sein und sachen freigeben... data races mehr.. und nicht alle threads werden beendet
+		pthread_exit(NULL); 
 	}
 	if (opt == 1)
-	{
-		// pthread_mutex_lock(&philo->data->printlock);
 		printf(MAG "%d %d is thinking\n", time, philo->n);
-		// pthread_mutex_unlock(&philo->data->printlock);
-	}
 	else if (opt == 2)
-	{
-		// pthread_mutex_lock(&philo->data->printlock);
 		printf(GRN "%d %d is eating\n" WHT, time, philo->n);
-		// pthread_mutex_unlock(&philo->data->printlock);
-	}
 	else if (opt == 3)
-	{
-		// pthread_mutex_lock(&philo->data->printlock);
 		printf(BLU "%d %d is sleeping\n" WHT, time, philo->n);
-		// pthread_mutex_unlock(&philo->data->printlock);
-	}
 	else if (opt == 4)
-	{
-		// pthread_mutex_lock(&philo->data->printlock);
 		printf(YEL "%d %d has taken a fork\n" WHT, time, philo->n);
-		// pthread_mutex_unlock(&philo->data->printlock);
-	}
 	else
-	{
-		// pthread_mutex_lock(&philo->data->printlock);
 		printf("(printmsg) - Error, wrong option");
-		// pthread_mutex_unlock(&philo->data->printlock);
-	}
-	// pthread_mutex_unlock(&philo->data->printlock);
-	
-	// prevtime = time;
 }
 
 void	*t_philosopher(void *param)
 {
+	int	time;
+
 	t_philo	*philo = (t_philo *)param;
+	time = get_time(philo->start_time);
 
 	if (philo->numofphilos == 1)
 	{
