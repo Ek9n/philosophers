@@ -6,7 +6,7 @@
 /*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 20:21:26 by hstein            #+#    #+#             */
-/*   Updated: 2023/09/07 00:43:09 by hstein           ###   ########.fr       */
+/*   Updated: 2023/09/07 17:22:04 by hstein           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,7 +210,8 @@ int	main(int argc, char **argv)
 			data.maxmeals = ft_atoi(argv[5]);
 		pthread_mutex_init(&data.printlock, NULL);
 		pthread_mutex_init(&data.deadlock, NULL);
-		philos = malloc(data.numofphilos * sizeof(t_philo));
+		// philos = malloc(data.numofphilos * sizeof(t_philo));
+		philos = ft_calloc(data.numofphilos, sizeof(t_philo));
 		i = -1;
 		while (++i < data.numofphilos)
 		{
@@ -250,7 +251,7 @@ int	main(int argc, char **argv)
 			i = 0;
 			if (pthread_create(&philos[i].tid, NULL, t_philosopher, &philos[i]) != 0)
 					printf("\nThread can't be created");
-			usleep(10);
+			// usleep(10);
 		}
 		while (++i < data.numofphilos)
 		{
@@ -258,7 +259,7 @@ int	main(int argc, char **argv)
 				if (pthread_create(&philos[i].tid, NULL, t_philosopher, &philos[i]) != 0)
 					printf("\nThread can't be created");
 		}	
-		usleep(10);
+		// usleep(10);
 		i = -1;
 		while (++i < data.numofphilos)
 		{

@@ -6,7 +6,7 @@
 /*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 22:41:19 by hstein            #+#    #+#             */
-/*   Updated: 2023/09/04 04:41:47 by hstein           ###   ########.fr       */
+/*   Updated: 2023/09/07 16:46:59 by hstein           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,32 @@ void	ft_putstr_fd(char *s, int fd)
 	i = 0;
 	while (s[i] != '\0')
 		write(fd, &s[i++], 1);
+}
+
+void	ft_bzero(void *s, size_t n)
+{
+	size_t	i;
+
+	i = 0;
+	while (i < n)
+	{
+		((char *) s)[i] = '\0';
+		i++;
+	}
+}
+
+void	*ft_calloc(size_t num, size_t size)
+{
+	void	*s;
+
+	s = (void *) malloc(num * size);
+	if (s == NULL)
+		return (0);
+	else
+	{
+		ft_bzero(s, num * size);
+		return (s);
+	}
 }
 
 int	ft_atoi(const char *str)
