@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hstein <hstein@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 20:21:26 by hstein            #+#    #+#             */
-/*   Updated: 2023/09/07 03:04:09 by hstein           ###   ########.fr       */
+/*   Updated: 2023/09/07 16:10:04 by hstein           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ void	printmsg(t_philo *philo, enum week opt)
 		if (philo->fork_flag)
 			pthread_mutex_unlock(&philo->fork);
 		// pthread_mutex_unlock(&philo->data->printlock);
-		// pthread_mutex_unlock(&philo->data->msglock);
+		pthread_mutex_unlock(&philo->data->msglock);
 		pthread_exit(NULL); // sol
 	}
 	timetodie(philo);
@@ -144,12 +144,14 @@ void	*t_philosopher(void *param)
 		pthread_mutex_lock(&philo->data->printlock);
 		printmsg(philo, sleeping);
 		pthread_mutex_unlock(&philo->data->printlock);
-		usleep(philo->timetosleep * 1000);
-		
 		pthread_mutex_lock(&philo->data->msglock);
 		if (philo->pretime + philo->life < get_time(philo->start_time))
+		{
+			// usleep(philo->pretime + philo->life);
 			printmsg(philo, 5);
+		}
 		pthread_mutex_unlock(&philo->data->msglock);
+		usleep(philo->timetosleep * 1000);
 	}
 
 	return (NULL);
