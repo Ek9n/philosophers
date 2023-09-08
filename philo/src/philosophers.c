@@ -6,7 +6,7 @@
 /*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 20:21:26 by hstein            #+#    #+#             */
-/*   Updated: 2023/09/08 18:46:21 by hstein           ###   ########.fr       */
+/*   Updated: 2023/09/08 21:04:32 by hstein           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,10 @@
 
 int	timetodie(t_philo *philo, int time, int opt)
 {
-	// static int	time;
-(void)opt;	
-	// time = get_time(philo->start_time);
+	(void)opt;
 	philo->life -= time - philo->prevtime;
-	// printf("philo%d, life=%d\n", philo->n, philo->life);
-	// pthread_mutex_lock(&philo->data->deadlock);
+	// printf("philo%d, life=%d, time-prevtime=%d\n", philo->n, philo->life, time - philo->prevtime);
+
 	if (philo->data->deadflag)
 	{
 		if (philo->right_fork_flag)
@@ -29,16 +27,11 @@ int	timetodie(t_philo *philo, int time, int opt)
 		pthread_mutex_unlock(&philo->data->printlock);
 		pthread_exit(NULL);
 	}
-	// pthread_mutex_unlock(&philo->data->deadlock);
 	if (philo->life <= 0)
 	{
-		// pthread_mutex_lock(&philo->data->printlock);
 		philo->data->deadflag = true;
-		printf(RED "%d %d died\n" WHT, time, philo->n); //died2!!!
+		printf(RED "%d %d died\n" WHT, time, philo->n);
 		timetodie(philo, time, opt);
-		// pthread_mutex_unlock(&philo->data->printlock);
-		// pthread_mutex_lock(&philo->data->deadlock);
-		// pthread_mutex_unlock(&philo->data->deadlock);
 		return (1);
 	}
 	philo->prevtime = time;
@@ -49,28 +42,11 @@ void	printmsg(t_philo *philo, enum week opt)
 {
 	static int	time;
 	
-	timetodie(philo, time, opt);
 	time = get_time(philo->start_time);
+	timetodie(philo, time, opt);
 
-	// printf("  philo:%d, time:%d, life:%d\n", philo->n, time, philo->life);
-	// pthread_mutex_unlock(&philo->data->printlock);
-	// printf("philo life = %d\n", philo->life);
-
-	// if (opt == 0 || philo->life <= 0)
-	// {
-	// 	printf(RED "%d %d died2\n" WHT, time, philo->n);
-	// 	if (philo->right_fork_flag)
-	// 		pthread_mutex_unlock(philo->right_fork);
-	// 	if (philo->fork_flag)
-	// 		pthread_mutex_unlock(&philo->fork);
-	// 	pthread_mutex_unlock(&philo->data->printlock);
-	// 	pthread_exit(NULL); 
-	// }
 	if (opt == 1)
-	{
 		printf(MAG "%d %d is thinking\n" WHT, time, philo->n);
-		// printf("%d %d life left:%d\n", time, philo->n, philo->life);
-	}
 	else if (opt == 2)
 		printf(GRN "%d %d is eating\n" WHT, time, philo->n);
 	else if (opt == 3)
@@ -84,37 +60,23 @@ void	printmsg(t_philo *philo, enum week opt)
 void	*t_philosopher(void *param)
 {
 	size_t	time;
-		// bool	ate = false;
 
 	t_philo	*philo = (t_philo *)param;
 	time = get_time(philo->start_time);
-
 	if (philo->numofphilos == 1)
 	{
 		usleep(philo->timetodie * 1000);
 		printf("%d %d died\n", get_time(philo->start_time), philo->n);
 		return (NULL);
 	}
-
 	while (1) // flag fuer death
 	{
-	// 	printmsg(philo, 0);
 	// think
 	pthread_mutex_lock(&philo->data->printlock);
 		printmsg(philo, thinking);
 	pthread_mutex_unlock(&philo->data->printlock);
 
 	// eat
-// if (philosopher->id % 2 == 0)
-// {
-// 	pthread_mutex_lock(&philosopher->right_fork);
-// 	pthread_mutex_lock(&philosopher->left_fork);
-// }
-// else
-// {
-// 	pthread_mutex_lock(&philosopher->left_fork);
-// 	pthread_mutex_lock(&philosopher->right_fork);
-// }
 		if (philo->n % 2 == 0)
 		{
 			pthread_mutex_lock(&philo->fork);
@@ -151,56 +113,19 @@ void	*t_philosopher(void *param)
 		{
 			philo->data->maxmeals--;
 			philo->maxmeals--;
-			// printf("philo %d meals left:%d\n", philo->n, philo->maxmeals);
-			// printf("meals left:%d\n", philo->data->maxmeals);
 			if (philo->data->maxmeals <= 0)
 				philo->data->deadflag = true;
 		}
 		pthread_mutex_unlock(&philo->data->printlock);
 		
 		usleep(philo->timetoeat * 1000);
-		
-		// (void) new_time;
+		// delay_cnt = 0;
 
-	// size_t	pre_time = get_time(philo->start_time);;
-	// size_t	new_time = pre_time;
-	// 	while (new_time - pre_time < (size_t)philo->timetoeat)
-	// 	{
-	// 		printf("delay_ms=%lu\n", new_time - pre_time);
-	// 		new_time = get_time(philo->start_time) * 1000;
-	// 		usleep(5);
-	// 	}
-	
-		// delay_ms(1);
-		// while (delay_ms(0) < (size_t)(philo->timetoeat))
+		// while (delay_cnt < philo->timetoeat * 1000)
 		// {
-		// 	printf("delay_ms=%lu\n", delay_ms(0));
-		// 	usleep(5);
+		// 	usleep(100);
+		// 	delay_cnt += 100;
 		// }
-		// delay_ms(1);
-
-		// static size_t	*prevtime;
-
-		// if (prevtime == NULL)
-		// {
-		// 	prevtime = malloc(philo->numofphilos * sizeof(size_t));
-		// }
-
-		// pthread_mutex_lock(&philo->data->printlock);
-		// size_t l_time = lapsed_time(prevtime[philo->n], philo->start_time, 0);
-		// pthread_mutex_unlock(&philo->data->printlock);
-		// while (l_time < (size_t)(philo->timetoeat))
-		// {
-		// 	usleep(10);
-		// 	pthread_mutex_lock(&philo->data->printlock);
-		// 	timetodie(philo, time, 0);
-		// 	l_time = lapsed_time(prevtime[philo->n], philo->start_time, 0);
-		// 	pthread_mutex_unlock(&philo->data->printlock);
-		// }
-		// l_time = lapsed_time(prevtime[philo->n], philo->start_time, 1);
-		// int	i = -1;
-		// while (++i < philo->numofphilos)
-		// 	free
 
 		pthread_mutex_unlock(philo->right_fork);
 			philo->right_fork_flag = false;
@@ -211,7 +136,22 @@ void	*t_philosopher(void *param)
 	pthread_mutex_lock(&philo->data->printlock);
 		printmsg(philo, sleeping);
 	pthread_mutex_unlock(&philo->data->printlock);
-		usleep(philo->timetosleep * 1000);
+
+
+	usleep(philo->timetosleep * 1000);
+		// int	time = get_time(philo->start_time);
+		// int	new_time = time;
+		// delay_cnt = 0;
+		// while (delay_cnt < philo->timetosleep * 1000)
+		// {
+		// 	usleep(100);
+		// 	delay_cnt += 100;
+		// 	// new_time = get_time(philo->start_time);
+		// 	// if (new_time - time )
+		// 	// pthread_mutex_lock(&philo->data->deadlock);
+		// 	// pthread_mutex_unlock(&philo->data->deadlock);
+
+		// }
 	}
 	// philo->pretime_check = time; /*******/
 	return (NULL);
