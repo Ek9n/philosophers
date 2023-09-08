@@ -6,7 +6,7 @@
 /*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 11:18:27 by hstein            #+#    #+#             */
-/*   Updated: 2023/09/08 17:57:51 by hstein           ###   ########.fr       */
+/*   Updated: 2023/09/08 21:15:41 by hstein           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ int		ft_atoi(const char *str);
 int		current_time(void);
 int		get_time(int start_time);
 void	printmsg(t_philo *philo, enum week opt);
-int		timetodie(t_philo *philo, int time, int opt);
+int		timetodie(t_philo *philo, int time);
 
 size_t		lapsed_time(size_t pretime, int start_time, bool reset);
 
