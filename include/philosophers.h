@@ -6,7 +6,7 @@
 /*   By: hstein <hstein@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 11:18:27 by hstein            #+#    #+#             */
-/*   Updated: 2023/09/07 17:30:36 by hstein           ###   ########.fr       */
+/*   Updated: 2023/09/08 13:19:27 by hstein           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ typedef struct philosopher
 	int				n;
 	bool			fork_flag;
 	bool			right_fork_flag;
+	// bool			maxmeals_flag;
 	pthread_t		tid;
 	pthread_mutex_t	fork;
 	pthread_mutex_t	*right_fork;
@@ -70,7 +71,7 @@ int		ft_atoi(const char *str);
 int		current_time(void);
 int		get_time(int start_time);
 void	printmsg(t_philo *philo, enum week opt);
-int		timetodie(t_philo *philo);
+int		timetodie(t_philo *philo, int time, int opt);
 
 // int		lapsed_time(t_data *data);
 
